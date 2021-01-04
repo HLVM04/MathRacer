@@ -4,8 +4,10 @@ var io = require('socket.io')(http);
 
 var adminPassword = 'potato1234' // Set this to any password you like :) (I like potatoes)
 
+var playersFinished = 0;
+
 var game_settings = { // Don't change this in code >:(
-  goal: 5,
+  goal: 20,
   game_state: 'Waiting',
   current_countdown: 5
 }
@@ -50,7 +52,7 @@ async function doCountdown() {
 
 io.on('connection', (socket) => {
     console.log('a user connected: ' + socket.id);
-    users[socket.id] = {Username: "", CurrentEquation: "", Score: 0}
+    users[socket.id] = {Username: "", CurrentEquation: "", Score: 0, Placement: ""};
 
     function generateNewEquation(pastEquationCorrect) {
       var equation = Math.floor(Math.random() * 10 + 1,5) + "+" + Math.floor(Math.random() * 10 + 1,5);
@@ -59,8 +61,8 @@ io.on('connection', (socket) => {
     }
     generateNewEquation();
 
-    socket.emit('user_data', users);
     socket.emit('game_settings_update', game_settings);
+    socket.emit('user_data', users);
   
     socket.on('submit_result', (result) => {
       var player = users[socket.id]
@@ -69,9 +71,15 @@ io.on('connection', (socket) => {
 
       if (result == correctResult) {
         player.Score += 1;
-        io.emit('player_update', socket.id, player);
       }
-      generateNewEquation(result == correctResult);
+
+      if (player.Score >= game_settings.goal) {
+        playersFinished += 1;
+        player.Placement = playersFinished.toString();
+      } else {
+        generateNewEquation(result == correctResult);
+      }
+      io.emit('player_update', socket.id, player);
     });
 
     socket.on('disconnect', () => {
@@ -85,7 +93,7 @@ io.on('connection', (socket) => {
     socket.on('set_username', (username) => {
         users[socket.id].Username = username
         //console.log('User id ' + socket.id + ' set their username to ' + username);
-        io.emit('username_set', socket.id, username);
+        io.emit('username_set', socket.id, users[socket.id]);
     });
 
     socket.on('set_countdown', (password, countdown) => {
@@ -100,10 +108,12 @@ io.on('connection', (socket) => {
     socket.on('reset_game', (password) => {
       if (password == adminPassword) {
         game_settings.game_state = "Waiting";
+        playersFinished = 0;
         io.emit('game_settings_update', game_settings);
 
         for (let i in users) {
           users[i].Score = 0;
+          users[i].Placement = "";
           io.emit('player_update', i, users[i]);
         }
       }

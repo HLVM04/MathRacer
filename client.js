@@ -29,11 +29,19 @@ lerp = function(a,b,u) {
         goal: 5
     }
 
-    function addPlayerDiv(playerId, username) {
+    function addPlayerDiv(playerId, player) {
+      if (player.Username == undefined) {return;}
       var playerDivTemplate = $("<div id='playerDiv' style='height: 3%; margin: 5px; display: flex; justify-content: space-between;'><label style='padding-right: 1%;' id='name'>Name</label><div style='width: 90%;' id='lane'><img style='-webkit-transform: translate(0%, 0); position: relative; left: 0%;' src='/car.png'></div><label id='score'>0</label></div>");
       $("#playerContainer").append(playerDivTemplate);
       playerDivTemplate.attr('id', playerId);
-      playerDivTemplate.find("#name").html(username);
+      playerDivTemplate.find("#name").html(player.Username);
+
+      if (player.Placement != "") {
+        playerDivTemplate.find("#score").html("#" + player.Placement);
+      }
+      else {
+        playerDivTemplate.find("#score").html(player.Score);
+      }
     }
 
     function checkResult() {
@@ -92,9 +100,12 @@ lerp = function(a,b,u) {
                 $("#countdownLabel").html(game_settings.current_countdown);
                 $("#countdownLabel").prop('hidden', !(game_settings.game_state == "Countdown"));
             }
-
             $("#equationBox").prop('hidden', !(game_settings.game_state == "Playing"));
             $("#inputContainer").prop('hidden', !(game_settings.game_state == "Playing"));
+            
+            if (game_settings.game_state == "Playing") {
+              $("#resultInput").focus();
+            }
         }
     }
 
@@ -108,7 +119,19 @@ lerp = function(a,b,u) {
       if (playerDiv == undefined) {return;};
 
       playerDiv.find("#name").html(player.Username);
-      playerDiv.find("#score").html(player.Score);
+      
+      if (player.Placement != "") {
+        playerDiv.find("#score").html("#" + player.Placement);
+
+        if (socket.id == playerId) {
+          $("#equationBox").prop('hidden', true);
+          $("#inputContainer").prop('hidden', true);
+        } 
+      } else {
+        playerDiv.find("#score").html(player.Score);
+      }
+      
+
       var progress = (player.Score / game_settings.goal * 100).clamp(0, 100)
       playerDiv.find("#lane").children().css("left", (progress).toString()+"%");
       playerDiv.find("#lane").children().css("-webkit-transform", 'translate(-' + (progress).toString() + "%" + ', 0)');
@@ -116,8 +139,8 @@ lerp = function(a,b,u) {
 
     socket.on('user_data', function(players){
       for (const [id, player] of Object.entries(players)) {
-        if (player.Username != "") {
-          addPlayerDiv(id, player.Username);
+        if (player.Username != "" && player.Username != undefined) {
+          addPlayerDiv(id, player);
         }
       }
     });
@@ -126,7 +149,7 @@ lerp = function(a,b,u) {
       $('#' + playerId).remove();
     });
 
-    socket.on('username_set', function(playerId, username){
-      addPlayerDiv(playerId, username);
+    socket.on('username_set', function(playerId, player){
+      addPlayerDiv(playerId, player);
     });
   });
