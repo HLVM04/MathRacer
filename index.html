@@ -30,14 +30,29 @@
         display: block; /* remove extra space below image */
         /* filter: invert(1%) sepia(1%) saturate(1%) hue-rotate(1deg) brightness(1000%) contrast(80%); */
       }
+
+      .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        color: white;
+      }
+
+      body {
+        background: rgb(0,101,255);
+        background: linear-gradient(0deg, rgba(0,101,255,1) 0%, rgba(0,212,255,1) 100%);
+      }
     </style>
     <script src="/client.js"></script>
 </head>
 
 
-<body style="background-color: blue;">
+<body>
     <div id="center_div">
-        <h1 style="font-size: 50px; margin: 25px; color: white;">MathRacer</h1>
+        <h1 style="font-size: 50px; padding-top: 25px; color: white;">MathRacer</h1>
+        <h2 style="font-size: 25px; padding-bottom: 25px; color: white;">Matematik ræs online!</h2>
 
         <h1 id="countdownLabel" hidden style="font-size: 50px; margin: 25px; color: white;">?</h1>
 
@@ -67,4 +82,8 @@
             <div id="playerContainer"></div>
         </div>
     </div>
+
+    <footer class="footer">
+      Made by Hjalte, Malte & Mathilde | Open-source on <a target="_blank" style="color: black;" href="https://github.com/HLVM04/MathRacer">GitHub!</a>
+    </footer>
 </body>
