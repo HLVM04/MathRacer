@@ -31,7 +31,7 @@ lerp = function(a,b,u) {
 
     function addPlayerDiv(playerId, player) {
       if (player.Username == undefined) {return;}
-      var playerDivTemplate = $("<div id='playerDiv' style='height: 3%; margin: 5px; display: flex; justify-content: space-between;'><label style='padding-right: 1%;' id='name'>Name</label><div style='width: 90%;' id='lane'><img style='-webkit-transform: translate(0%, 0); position: relative; left: 0%;' src='/car.png'></div><label id='score'>0</label></div>");
+      var playerDivTemplate = $("<div id='playerDiv' style='height: 4%; margin: 5px; display: flex; justify-content: space-between;'><label style='padding-right: 1%;' id='name'>Name</label><div style='width: 90%;' id='lane'><img style='-webkit-transform: translate(0%, 0); position: relative; left: 0%;' src='/car.png'></div><label id='score'>0</label></div>");
       $("#playerContainer").append(playerDivTemplate);
       playerDivTemplate.attr('id', playerId);
       playerDivTemplate.find("#name").html(player.Username);
